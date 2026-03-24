@@ -1,5 +1,5 @@
 const MAIN_HOST = "208.123.185.235.sslip.io";
-const PORTS = [2001,2002,2003,2004,2007,2008,2009,2010,2011,2012,2013,2014];
+const PORTS = [2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014];
 
 Deno.serve(async (req: Request) => {
   const url = new URL(req.url);
@@ -8,7 +8,11 @@ Deno.serve(async (req: Request) => {
   }
   if (req.headers.get("upgrade") === "websocket") {
     const { socket: clientWs, response } = Deno.upgradeWebSocket(req);
-    const port = PORTS[Math.floor(Math.random() * PORTS.length)];
+    
+    // Extract port from path: /p2001/vless-ws -> 2001, /vless-ws -> random
+    const m = url.pathname.match(/^\/p(\d+)\/vless-ws$/);
+    const port = m ? parseInt(m[1]) : PORTS[Math.floor(Math.random() * PORTS.length)];
+    
     const buffer: any[] = [];
     let upstreamReady = false;
 
